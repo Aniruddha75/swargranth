@@ -2,11 +2,13 @@ import { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Search, Plus, Music, Trash2 } from 'lucide-react';
+import BandishDetail from '../components/BandishDetail';
 
 export default function BandishList() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [bandishes, setBandishes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedBandish, setSelectedBandish] = useState<any>(null);
   
   // Initialize from URL param
   const initialSearch = searchParams.get('search') || '';
@@ -85,7 +87,11 @@ export default function BandishList() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filtered.map((b, i) => (
-            <div key={i} className="bg-slate-900 border border-slate-800 rounded-xl p-5 hover:border-cyan-500/50 transition-colors flex flex-col h-full relative group">
+            <div 
+              key={i} 
+              onClick={() => setSelectedBandish(b)}
+              className="bg-slate-900 border border-slate-800 rounded-xl p-5 hover:border-cyan-500/50 transition-colors flex flex-col h-full relative group cursor-pointer active:scale-[0.98]"
+            >
                 <button
                     onClick={async (e) => {
                         e.preventDefault();
@@ -141,6 +147,13 @@ export default function BandishList() {
                 </div>
             )}
         </div>
+      )}
+      
+      {selectedBandish && (
+        <BandishDetail 
+          bandish={selectedBandish} 
+          onClose={() => setSelectedBandish(null)} 
+        />
       )}
     </div>
   );

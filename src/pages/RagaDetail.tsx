@@ -23,7 +23,7 @@ export default function RagaDetail() {
   if (!raga) return <div className="text-center py-12 text-red-400">Raga not found</div>;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div className="w-full max-w-4xl mx-auto space-y-8">
       <Link to="/ragas" className="inline-flex items-center gap-2 text-slate-400 hover:text-emerald-400 transition-colors">
         <ArrowLeft size={16} /> Back to Ragas
       </Link>

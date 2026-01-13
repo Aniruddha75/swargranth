@@ -17,11 +17,11 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-start pt-12 md:pt-20 p-4">
       <div className="mb-8 text-center animate-in fade-in slide-in-from-bottom-4 duration-700">
         <Music className="w-16 h-16 text-emerald-400 mx-auto mb-4" />
         <h1 className="text-4xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
-            MusicVault
+            Swara Granth
         </h1>
         <p className="text-slate-500 mt-2">Your Digital Raga Repository</p>
       </div>

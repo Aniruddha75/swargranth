@@ -31,7 +31,7 @@ export default function DiaryList() {
            <p className="text-slate-400 mt-1">Reflections, learnings, and musical journey</p>
         </div>
         <Link to="/diary/new" className="flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-           <Plus size={18} /> New Entry
+           <Plus size={18} />
         </Link>
       </div>
 

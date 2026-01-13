@@ -143,7 +143,7 @@ export default function KaryakramPlanner() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8 animate-in fade-in">
+    <div className="w-full max-w-5xl mx-auto space-y-8 animate-in fade-in">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
             <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">

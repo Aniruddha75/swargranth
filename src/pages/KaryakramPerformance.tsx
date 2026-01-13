@@ -64,7 +64,7 @@ export default function KaryakramPerformance() {
                 <p>No songs in this setlist yet.</p>
             </div>
         ) : (
-            <div className="max-w-4xl mx-auto p-6 space-y-8 pb-32">
+            <div className="w-full max-w-4xl mx-auto p-6 space-y-8 pb-32">
                  
                  {/* Song Content */}
                  <div className="space-y-6">

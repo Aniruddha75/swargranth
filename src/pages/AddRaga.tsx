@@ -106,15 +106,15 @@ export default function AddRaga() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
-      <div className="flex items-center justify-between">
+    <div className="w-full max-w-4xl mx-auto space-y-8">
+      <div className="flex items-center justify-between gap-4">
         <button 
           onClick={() => navigate(-1)}
-          className="flex items-center gap-2 text-slate-400 hover:text-emerald-400 transition-colors"
+          className="flex items-center gap-2 text-slate-400 hover:text-emerald-400 transition-colors flex-shrink-0"
         >
-          <ArrowLeft size={16} /> Cancel
+          <ArrowLeft size={16} /> <span className="hidden sm:inline">Cancel</span>
         </button>
-        <h1 className="text-2xl font-bold text-white">Add New Raga</h1>
+        <h1 className="text-xl md:text-2xl font-bold text-white text-right">Add New Raga</h1>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">
@@ -125,28 +125,12 @@ export default function AddRaga() {
             <button 
               type="button"
               onClick={() => setShowKeyboard(!showKeyboard)}
-              className={`flex items-center gap-2 text-sm px-3 py-1.5 rounded-lg transition-colors border ${showKeyboard ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50' : 'bg-slate-800 text-slate-400 border-slate-700'}`}
+              className={`flex items-center gap-2 text-xs md:text-sm px-2 md:px-3 py-1.5 rounded-lg transition-colors border ${showKeyboard ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50' : 'bg-slate-800 text-slate-400 border-slate-700'}`}
             >
               <Keyboard size={16} />
-              {showKeyboard ? 'Hide Swara Keyboard' : 'Show Swara Keyboard'}
+              <span className="hidden sm:inline">{showKeyboard ? 'Hide' : 'Show'} Keyboard</span>
             </button>
           </div>
-
-          {showKeyboard && (
-            <div className="mb-6 animate-in slide-in-from-top-4 fade-in duration-200">
-               <div className="bg-slate-950 p-4 rounded-xl border border-slate-800">
-                  <p className="text-xs text-slate-500 mb-2 text-center uppercase tracking-widest font-bold">
-                    {activeField ? `Editing: ${activeField.toUpperCase()}` : 'Select a field below to type'}
-                  </p>
-                  <SwaraKeyboard 
-                    onSwaraClick={handleSwaraInput} 
-                    onBackspace={handleBackspace}
-                    onSpace={handleSpace}
-                    onClear={clearField}
-                  />
-               </div>
-            </div>
-          )}
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -160,14 +144,15 @@ export default function AddRaga() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-400 mb-1">Thaat</label>
-               <select 
+              <label className="block text-sm font-medium text-slate-400 mb-1">Thaat *</label>
+              <select 
+                required
                 className="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-white focus:border-emerald-500 outline-none"
                 value={raga.thaat}
                 onChange={e => setRaga({...raga, thaat: e.target.value})}
               >
                 <option value="">Select Thaat...</option>
-                {['Bilawal', 'Kalyan', 'Khamaj', 'Bhairav', 'Poorvi', 'Marwa', 'Kafi', 'Asavari', 'Bhairavi', 'Todi'].map(t => (
+                {['Bilawal', 'Khamaj', 'Kafi', 'Asavari', 'Bhairavi', 'Kalyan', 'Marwa', 'Purvi', 'Todi', 'Bhairav'].map(t => (
                   <option key={t} value={t}>{t}</option>
                 ))}
               </select>
@@ -176,7 +161,7 @@ export default function AddRaga() {
 
            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
              <div>
-              <label className="block text-sm font-medium text-slate-400 mb-1">Time (Prahar)</label>
+              <label className="block text-sm font-medium text-slate-400 mb-1">Time of Day</label>
                <select 
                 className="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-white focus:border-emerald-500 outline-none"
                 value={raga.time}
@@ -218,6 +203,21 @@ export default function AddRaga() {
                  onChange={e => setRaga({...raga, aroha: e.target.value})}
                  onFocus={() => { setActiveField('aroha'); setShowKeyboard(true); }}
                />
+               {showKeyboard && activeField === 'aroha' && (
+                 <div className="mt-2 animate-in slide-in-from-top-2 fade-in duration-200">
+                    <div className="bg-slate-950 p-3 rounded-xl border border-emerald-500/30">
+                       <p className="text-xs text-emerald-400 mb-2 text-center uppercase tracking-widest font-bold">
+                         Swara Keyboard
+                       </p>
+                       <SwaraKeyboard 
+                         onSwaraClick={handleSwaraInput} 
+                         onBackspace={handleBackspace}
+                         onSpace={handleSpace}
+                         onClear={clearField}
+                       />
+                    </div>
+                 </div>
+               )}
              </div>
              <div>
                <label className={`block text-sm font-medium mb-1 transition-colors ${activeField === 'avroha' ? 'text-emerald-400' : 'text-slate-400'}`}>Avroha *</label>
@@ -228,6 +228,21 @@ export default function AddRaga() {
                  onChange={e => setRaga({...raga, avroha: e.target.value})}
                  onFocus={() => { setActiveField('avroha'); setShowKeyboard(true); }}
                />
+               {showKeyboard && activeField === 'avroha' && (
+                 <div className="mt-2 animate-in slide-in-from-top-2 fade-in duration-200">
+                    <div className="bg-slate-950 p-3 rounded-xl border border-emerald-500/30">
+                       <p className="text-xs text-emerald-400 mb-2 text-center uppercase tracking-widest font-bold">
+                         Swara Keyboard
+                       </p>
+                       <SwaraKeyboard 
+                         onSwaraClick={handleSwaraInput} 
+                         onBackspace={handleBackspace}
+                         onSpace={handleSpace}
+                         onClear={clearField}
+                       />
+                    </div>
+                 </div>
+               )}
              </div>
               <div>
                <label className={`block text-sm font-medium mb-1 transition-colors ${activeField === 'pakad' ? 'text-emerald-400' : 'text-slate-400'}`}>Pakad *</label>
@@ -238,6 +253,21 @@ export default function AddRaga() {
                  onChange={e => setRaga({...raga, pakad: e.target.value})}
                  onFocus={() => { setActiveField('pakad'); setShowKeyboard(true); }}
                />
+               {showKeyboard && activeField === 'pakad' && (
+                 <div className="mt-2 animate-in slide-in-from-top-2 fade-in duration-200">
+                    <div className="bg-slate-950 p-3 rounded-xl border border-emerald-500/30">
+                       <p className="text-xs text-emerald-400 mb-2 text-center uppercase tracking-widest font-bold">
+                         Swara Keyboard
+                       </p>
+                       <SwaraKeyboard 
+                         onSwaraClick={handleSwaraInput} 
+                         onBackspace={handleBackspace}
+                         onSpace={handleSpace}
+                         onClear={clearField}
+                       />
+                    </div>
+                 </div>
+               )}
              </div>
            </div>
 

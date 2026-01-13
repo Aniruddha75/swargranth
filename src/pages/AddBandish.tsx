@@ -102,15 +102,15 @@ export default function AddBandish() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-8">
-      <div className="flex items-center justify-between">
+    <div className="w-full max-w-2xl mx-auto space-y-8">
+      <div className="flex items-center justify-between gap-4">
         <button 
           onClick={() => navigate(-1)}
-          className="flex items-center gap-2 text-slate-400 hover:text-emerald-400 transition-colors"
+          className="flex items-center gap-2 text-slate-400 hover:text-emerald-400 transition-colors flex-shrink-0"
         >
-          <ArrowLeft size={16} /> Cancel
+          <ArrowLeft size={16} /> <span className="hidden sm:inline">Cancel</span>
         </button>
-        <h1 className="text-2xl font-bold text-white">Add New Bandish</h1>
+        <h1 className="text-xl md:text-2xl font-bold text-white text-right">Add New Bandish</h1>
       </div>
 
       <form onSubmit={handleSubmit} className="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-6">
