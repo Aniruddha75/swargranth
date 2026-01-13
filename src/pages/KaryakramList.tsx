@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Calendar, MapPin, Music2, Trash2 } from 'lucide-react';
+import { Plus, Calendar, MapPin,  Trash2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import type { Karyakram } from '../types/database';
 
