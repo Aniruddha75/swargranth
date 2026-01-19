@@ -58,7 +58,12 @@ export const ragaService = {
             console.error('Cannot create in mock mode');
             return { data: null, error: { message: 'Supabase not configured' } };
         }
-        return supabase.from('ragas').insert(raga).select().single();
+        const { data: userData } = await supabase.auth.getUser();
+
+        return supabase.from('ragas').insert({
+            ...raga,
+            user_id: userData.user?.id || null
+        }).select().single();
     },
 
     async delete(id: string) {

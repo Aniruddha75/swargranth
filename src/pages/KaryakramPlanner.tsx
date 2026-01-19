@@ -287,7 +287,7 @@ export default function KaryakramPlanner() {
                         </div>
                     ) : (
                         items.map((item, index) => (
-                            <div key={item.id || index} className="flex items-center gap-4 bg-slate-900/50 border border-slate-800 rounded-xl p-4 group hover:bg-slate-900 transition-colors">
+                            <div key={item.id || index} className="flex items-center gap-4 bg-slate-900/50 border border-slate-800 rounded-xl p-2 group hover:bg-slate-900 transition-colors">
                                 <span className="text-2xl font-bold text-slate-700 w-8 text-center">{index + 1}</span>
                                 
                                 <div className="flex-1">
@@ -295,25 +295,25 @@ export default function KaryakramPlanner() {
                                     <p className="text-sm text-slate-400">{(item.bandish as any)?.raga?.name} • {(item.bandish as any)?.type}</p>
                                 </div>
 
-                                <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <div className="flex items-center gap-0 opacity-100 group-hover:opacity-100 transition-opacity">
                                     <button 
                                         onClick={() => moveItem(index, 'up')}
                                         disabled={index === 0}
-                                        className="p-2 hover:bg-slate-800 rounded text-slate-400 hover:text-white disabled:opacity-30"
+                                        className="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white disabled:opacity-30"
                                     >
                                         <ArrowUp size={18} />
                                     </button>
                                     <button 
                                         onClick={() => moveItem(index, 'down')}
                                         disabled={index === items.length - 1}
-                                        className="p-2 hover:bg-slate-800 rounded text-slate-400 hover:text-white disabled:opacity-30"
+                                        className="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white disabled:opacity-30"
                                     >
                                         <ArrowDown size={18} />
                                     </button>
-                                    <div className="w-px h-6 bg-slate-800 mx-2"></div>
+                                    <div className="w-px h-6 bg-slate-800 mx-1"></div>
                                     <button 
                                         onClick={() => item.id && removeItem(item.id)}
-                                        className="p-2 hover:bg-red-500/10 rounded text-slate-400 hover:text-red-400"
+                                        className="p-1 hover:bg-red-500/10 rounded text-slate-400 hover:text-red-400"
                                     >
                                         <Trash2 size={18} />
                                     </button>

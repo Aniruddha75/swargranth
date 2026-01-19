@@ -110,9 +110,12 @@ export default function AddBandish() {
         // Let's coerce undefined to null for the DB if needed, but TypeScript might complain.
         // Actually, let's just use the Supabase client directly.
         
+        const { data: userData } = await supabase.auth.getUser();
+        
         const dbPayload = {
             ...payload,
-            raga_id: ragaId || null
+            raga_id: ragaId || null,
+            user_id: userData.user?.id || null
         };
 
         const { error } = await supabase

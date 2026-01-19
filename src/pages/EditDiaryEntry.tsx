@@ -46,6 +46,10 @@ export default function EditDiaryEntry() {
     setLoading(true);
     
     try {
+      console.log('--- DIARY UPDATE DEBUG ---');
+      console.log('Target ID:', id);
+      console.log('Payload:', { title, content, image_url: imageUrl });
+      
       const { data, error } = await supabase
         .from('diary_entries')
         .update({
@@ -56,10 +60,18 @@ export default function EditDiaryEntry() {
         .eq('id', id)
         .select();
 
-      if (error) throw error;
-      if (!data || data.length === 0) throw new Error('No entry found to update');
+      if (error) {
+        console.error('Supabase Error:', error);
+        throw error;
+      }
       
-      console.log('Update successful:', data);
+      console.log('Response Data:', data);
+
+      if (!data || data.length === 0) {
+        console.warn('Warning: No rows were updated. Check RLS or ID match.');
+        throw new Error('Save failed. This record might be protected by Row Level Security (RLS) or owned by another user.');
+      }
+      
       navigate('/diary');
     } catch (err: any) {
       console.error('Error updating entry:', err);

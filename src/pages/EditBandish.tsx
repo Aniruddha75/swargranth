@@ -84,7 +84,15 @@ export default function EditBandish() {
       return;
     }
 
+    const { data: userData } = await supabase.auth.getUser();
+    console.log('--- BANDISH LOAD DEBUG ---');
+    console.log('Current User ID:', userData.user?.id);
+    console.log('Loaded Row Data:', data);
+
     if (data) {
+      if (data.user_id !== userData.user?.id) {
+        console.warn('CRITICAL: Row user_id does not match current user. Update will likely fail due to RLS.');
+      }
       setTitle(data.title || '');
       setType(data.type || 'khayal');
       setRagaId(data.raga_id || '');
@@ -138,16 +146,28 @@ export default function EditBandish() {
             notation_image_url: uploadedImageUrl
         };
 
+        console.log('--- BANDISH UPDATE DEBUG ---');
+        console.log('Target ID:', id);
+        console.log('Payload:', updatePayload);
+
         const { data, error } = await supabase
             .from('bandishes')
             .update(updatePayload)
             .eq('id', id)
             .select();
 
-        if (error) throw error;
-        if (!data || data.length === 0) throw new Error('No bandish found to update');
+        if (error) {
+            console.error('Supabase Error:', error);
+            throw error;
+        }
         
-        console.log('Bandish update successful:', data);
+        console.log('Response Data:', data);
+
+        if (!data || data.length === 0) {
+            console.warn('Warning: No rows were updated. Check RLS or ID match.');
+            throw new Error('Save failed. This record might be protected by Row Level Security (RLS) or owned by another user. If you are using a shared access code, ensure your Supabase policies allow public updates.');
+        }
+        
         navigate('/notes');
     } catch (err: any) {
       console.error('Error updating bandish:', err);

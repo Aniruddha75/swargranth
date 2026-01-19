@@ -15,10 +15,13 @@ export default function AddDiaryEntry() {
     e.preventDefault();
     setLoading(true);
     
+    const { data: userData } = await supabase.auth.getUser();
+    
     const { error } = await supabase.from('diary_entries').insert({
         title,
         content,
-        image_url: imageUrl || null
+        image_url: imageUrl || null,
+        user_id: userData.user?.id || null
     });
 
     if (error) {
