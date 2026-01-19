@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Clock, Music2 } from 'lucide-react';
+import { ArrowLeft, Clock, Music2, Edit } from 'lucide-react';
 import { ragaService } from '../services/ragaService';
 import type { Raga } from '../types/database';
 
@@ -39,6 +39,13 @@ export default function RagaDetail() {
                <Clock size={18} className="text-emerald-500" />
                <span>{raga.time}</span>
              </div>
+             <Link
+                to={`/ragas/edit/${raga.id}`}
+                className="bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-3 py-2 rounded-lg transition-colors flex items-center gap-2"
+             >
+                <Edit size={16} />
+                Edit
+             </Link>
              <button 
                 onClick={async () => {
                    if (window.confirm('Are you sure you want to delete this Raga? This cannot be undone.')) {

@@ -3,10 +3,12 @@ import { supabase } from '../lib/supabase';
 import { Link } from 'react-router-dom';
 import { Plus, BookOpen, Calendar } from 'lucide-react';
 import type { DiaryEntry } from '../types/database';
+import DiaryDetail from '../components/DiaryDetail';
 
 export default function DiaryList() {
   const [entries, setEntries] = useState<DiaryEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedEntry, setSelectedEntry] = useState<any>(null);
 
   useEffect(() => {
     loadEntries();
@@ -38,9 +40,13 @@ export default function DiaryList() {
       {loading ? (
         <div className="text-center py-12 text-slate-500">Loading diary...</div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {entries.map(entry => (
-                <div key={entry.id} className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden hover:border-amber-500/30 transition-colors flex flex-col">
+                <div 
+                  key={entry.id} 
+                  onClick={() => setSelectedEntry(entry)}
+                  className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden hover:border-amber-500/30 transition-colors flex flex-col cursor-pointer active:scale-[0.98]"
+                >
                     {entry.image_url && (
                         <div className="h-48 w-full overflow-hidden">
                             <img src={entry.image_url} alt={entry.title} className="w-full h-full object-cover opacity-80 hover:opacity-100 transition-opacity" />
@@ -63,6 +69,14 @@ export default function DiaryList() {
                 </div>
             )}
         </div>
+      )}
+      
+      {selectedEntry && (
+        <DiaryDetail 
+          entry={selectedEntry} 
+          onClose={() => setSelectedEntry(null)} 
+          onDeleted={loadEntries}
+        />
       )}
     </div>
   );

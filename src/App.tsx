@@ -4,11 +4,14 @@ import Home from './pages/Home';
 import RagaList from './pages/RagaList';
 import RagaDetail from './pages/RagaDetail';
 import AddRaga from './pages/AddRaga';
+import EditRaga from './pages/EditRaga';
 import BandishList from './pages/BandishList';
 import AddBandish from './pages/AddBandish';
+import EditBandish from './pages/EditBandish';
 import SwaraSearch from './pages/SwaraSearch';
 import DiaryList from './pages/DiaryList';
 import AddDiaryEntry from './pages/AddDiaryEntry';
+import EditDiaryEntry from './pages/EditDiaryEntry';
 import Login from './pages/Login';
 import ProtectedRoute from './components/ProtectedRoute';
 import KaryakramList from './pages/KaryakramList';
@@ -26,15 +29,18 @@ function App() {
           {/* Raga Routes */}
           <Route path="ragas" element={<RagaList />} />
           <Route path="ragas/new" element={<AddRaga />} />
+          <Route path="ragas/edit/:id" element={<EditRaga />} />
           <Route path="ragas/:id" element={<RagaDetail />} />
           
           {/* Bandish Routes */}
           <Route path="notes" element={<BandishList />} />
           <Route path="notes/new" element={<AddBandish />} />
+          <Route path="notes/edit/:id" element={<EditBandish />} />
           
           {/* Diary Routes */}
           <Route path="diary" element={<DiaryList />} />
           <Route path="diary/new" element={<AddDiaryEntry />} />
+          <Route path="diary/edit/:id" element={<EditDiaryEntry />} />
           
           {/* Helper Routes */}
           <Route path="search/swara" element={<SwaraSearch />} />

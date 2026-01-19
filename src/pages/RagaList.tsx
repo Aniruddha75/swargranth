@@ -52,7 +52,7 @@ export default function RagaList() {
       {loading ? (
         <div className="text-center py-12 text-slate-500">Loading ragas...</div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
           {filteredRagas.map(raga => (
             <Link key={raga.id} to={`/ragas/${raga.id}`}>
               <div className="group p-5 bg-slate-900 border border-slate-800 rounded-xl hover:border-emerald-500/50 transition-all hover:shadow-lg hover:shadow-emerald-500/10 h-full flex flex-col">

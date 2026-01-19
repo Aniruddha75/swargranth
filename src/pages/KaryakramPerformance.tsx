@@ -10,6 +10,23 @@ export default function KaryakramPerformance() {
   const [items, setItems] = useState<KaryakramItem[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [showControls, setShowControls] = useState(true);
+  const [lastActivity, setLastActivity] = useState(Date.now());
+
+  useEffect(() => {
+    let timer: any;
+    if (showControls) {
+      timer = setTimeout(() => {
+        setShowControls(false);
+      }, 5000);
+    }
+    return () => clearTimeout(timer);
+  }, [showControls, lastActivity, currentIndex]);
+
+  const handleActivity = () => {
+    if (!showControls) setShowControls(true);
+    setLastActivity(Date.now());
+  };
 
   useEffect(() => {
     fetchData();
@@ -38,9 +55,13 @@ export default function KaryakramPerformance() {
   if (!karyakram) return <div>Not found</div>;
 
   return (
-    <div className="fixed inset-0 z-[100] bg-black text-white overflow-y-auto">
+    <div 
+        className="fixed inset-0 z-[100] bg-black text-white overflow-y-auto cursor-pointer"
+        onClick={handleActivity}
+        onMouseMove={handleActivity}
+    >
         {/* Top Bar */}
-        <div className="sticky top-0 bg-black/80 backdrop-blur-md border-b border-slate-800 p-4 flex items-center justify-between">
+        <div className={`sticky top-0 bg-black/80 backdrop-blur-md border-b border-slate-800 p-4 flex items-center justify-between transition-all duration-500 z-50 ${showControls ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 pointer-events-none'}`}>
             <div>
                 <h1 className="text-lg font-bold text-slate-200">{karyakram.title}</h1>
                 <p className="text-xs text-slate-500 flex items-center gap-2">
@@ -113,10 +134,13 @@ export default function KaryakramPerformance() {
         )}
 
         {/* Bottom Controls */}
-        <div className="fixed bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black via-black to-transparent">
+        <div className={`fixed bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black via-black to-transparent transition-all duration-500 ${showControls ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0 pointer-events-none'}`}>
              <div className="max-w-md mx-auto flex items-center justify-between gap-8">
                  <button 
-                    onClick={() => setCurrentIndex(prev => Math.max(0, prev - 1))}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        setCurrentIndex(prev => Math.max(0, prev - 1));
+                    }}
                     disabled={currentIndex === 0}
                     className="p-4 rounded-full bg-slate-900 border border-slate-800 text-white hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-95"
                  >
@@ -131,7 +155,10 @@ export default function KaryakramPerformance() {
                  </div>
 
                  <button 
-                    onClick={() => setCurrentIndex(prev => Math.min(items.length - 1, prev + 1))}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        setCurrentIndex(prev => Math.min(items.length - 1, prev + 1));
+                    }}
                     disabled={currentIndex === items.length - 1}
                     className="p-4 rounded-full bg-emerald-600 text-white hover:bg-emerald-500 disabled:bg-slate-900 disabled:text-slate-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-95 shadow-xl shadow-emerald-900/50"
                  >

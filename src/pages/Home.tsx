@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Search, Plus, Library, FileText, ListMusic, Book, Music, Calendar } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import logo from '../assets/swargranthbrandname.png';
 
 export default function Home() {
   const navigate = useNavigate();
@@ -41,8 +42,8 @@ export default function Home() {
       // Fetch Bandishes
       const { data: bandishes } = await supabase
         .from('bandishes')
-        .select('id, title, raga_id, type')
-        .ilike('title', term)
+        .select('id, title, raga_id, type, composer, tala')
+        .or(`title.ilike.${term},lyrics.ilike.${term},composer.ilike.${term},tala.ilike.${term}`)
         .limit(3);
 
       const results = [
@@ -65,13 +66,14 @@ export default function Home() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto flex flex-col items-center justify-start pt-4 md:pt-0 md:justify-center md:min-h-[80vh] space-y-4 md:space-y-12">
+    <div className="max-w-4xl mx-auto flex flex-col items-center justify-start pt-0 md:pt-0 md:justify-center md:min-h-[80vh] space-y-4 md:space-y-12">
       
-      <div className="text-center space-y-4">
+      <div className="text-center space-y-4 flex flex-col items-center justify-center ">
         {/* Title - Hidden on mobile, shown on desktop */}
-        <h1 className="hidden md:block text-7xl font-bold bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-500 bg-clip-text text-transparent pb-2">
+        {/* <h1 className="hidden md:block text-7xl font-bold bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-500 bg-clip-text text-transparent pb-2">
           Swar Granth
-        </h1>
+        </h1> */}
+        <img src={logo} alt="SwarGranth" className="w-64" />
         {/* Hidden on small screens to save space */}
         <p className="text-lg md:text-xl text-slate-400 hidden md:block">Your personal universe of Ragas and Notes.</p>
       </div>

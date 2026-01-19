@@ -1,4 +1,5 @@
-import { ArrowLeft, Music, User, Clock } from 'lucide-react';
+import { ArrowLeft, Music, User, Clock, Edit } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface BandishDetailProps {
   bandish: any;
@@ -13,13 +14,23 @@ export default function BandishDetail({ bandish, onClose }: BandishDetailProps) 
       {/* Content */}
       <div className="w-full max-w-4xl mx-auto p-6 py-8 space-y-8">
         {/* Back Button */}
-        <button
-          onClick={onClose}
-          className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors group"
-        >
-          <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
-          <span>Back to Library</span>
-        </button>
+        <div className="flex items-center justify-between">
+          <button
+            onClick={onClose}
+            className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors group"
+          >
+            <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
+            <span>Back to Library</span>
+          </button>
+          
+          <Link
+            to={`/notes/edit/${bandish.id}`}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 rounded-lg text-cyan-400 font-medium transition-colors"
+          >
+            <Edit size={16} />
+            Edit
+          </Link>
+        </div>
 
         {/* Raga Badge */}
         {bandish.ragas?.name && (

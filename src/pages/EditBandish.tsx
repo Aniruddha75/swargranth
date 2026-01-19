@@ -1,17 +1,16 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save } from 'lucide-react';
 import { ragaService } from '../services/ragaService';
 import { supabase } from '../lib/supabase';
-import type { BandishInput, Raga } from '../types/database';
+import type { Raga } from '../types/database';
 import { BANDISH_TYPES, TAAL_OPTIONS } from '../constants/musicConstants';
 
-import { useSearchParams } from 'react-router-dom';
-
-export default function AddBandish() {
+export default function EditBandish() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const { id } = useParams<{ id: string }>();
   const [loading, setLoading] = useState(false);
+  const [dataLoading, setDataLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [ragas, setRagas] = useState<Raga[]>([]);
   const [existingComposers, setExistingComposers] = useState<string[]>([]);
@@ -20,35 +19,37 @@ export default function AddBandish() {
   // Form State
   const [title, setTitle] = useState('');
   const [type, setType] = useState('khayal');
-  const [ragaId, setRagaId] = useState<string>(searchParams.get('ragaId') || '');
+  const [ragaId, setRagaId] = useState<string>('');
   const [composer, setComposer] = useState('');
   const [tala, setTala] = useState('');
   const [tempo, setTempo] = useState('madhya');
-  const [content, setContent] = useState(''); // Maps to lyrics
+  const [content, setContent] = useState('');
   
   // Media State
   const [audioUrl, setAudioUrl] = useState('');
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [existingImageUrl, setExistingImageUrl] = useState('');
   
   useEffect(() => {
     loadRagas();
+    loadBandish();
     loadSuggestions();
-  }, []);
+  }, [id]);
 
   async function loadSuggestions() {
     const { data } = await supabase.from('bandishes').select('composer, tala');
     if (data) {
-        const composers: string[] = Array.from(
-          data.reduce((acc, b) => {
+        const composers: string[] = Array.from<string>(
+          data.reduce((acc: Map<string, string>, b) => {
             const val = b.composer?.trim();
             if (val && !acc.has(val.toLowerCase())) acc.set(val.toLowerCase(), val);
             return acc;
           }, new Map<string, string>()).values()
         ).sort();
 
-        const talas: string[] = Array.from(
-          data.reduce((acc, b) => {
+        const talas: string[] = Array.from<string>(
+          data.reduce((acc: Map<string, string>, b) => {
             const val = b.tala?.trim();
             if (val && !acc.has(val.toLowerCase())) acc.set(val.toLowerCase(), val);
             return acc;
@@ -65,15 +66,48 @@ export default function AddBandish() {
     if (data) setRagas(data);
   }
 
+  async function loadBandish() {
+    if (!id || !import.meta.env.VITE_SUPABASE_URL) {
+      setDataLoading(false);
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from('bandishes')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) {
+      setError('Failed to load bandish');
+      setDataLoading(false);
+      return;
+    }
+
+    if (data) {
+      setTitle(data.title || '');
+      setType(data.type || 'khayal');
+      setRagaId(data.raga_id || '');
+      setComposer(data.composer || '');
+      setTala(data.tala || '');
+      setTempo(data.tempo || 'madhya');
+      setContent(data.lyrics || '');
+      setAudioUrl(data.audio_url || '');
+      setExistingImageUrl(data.notation_image_url || '');
+      setPreviewUrl(data.notation_image_url || null);
+    }
+    setDataLoading(false);
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
     try {
-        let uploadedImageUrl = '';
+        let uploadedImageUrl = existingImageUrl;
         
-        // Handle Image Upload
+        // Handle Image Upload if new file selected
         if (imageFile) {
             const fileExt = imageFile.name.split('.').pop();
             const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
@@ -92,12 +126,11 @@ export default function AddBandish() {
             uploadedImageUrl = publicUrl;
         }
 
-        const payload: BandishInput = {
+        const updatePayload = {
             title,
             type: type as any,
             lyrics: content,
-            // Only include raga_id if it's set and not empty string
-            raga_id: (ragaId || null) as string | null, 
+            raga_id: ragaId || null,
             tempo: tempo as any,
             tala: tala,
             composer: composer,
@@ -105,30 +138,25 @@ export default function AddBandish() {
             notation_image_url: uploadedImageUrl
         };
 
-        // If 'general_note', explicitly set raga_id to null if the type definition allows undefined, 
-        // but for Supabase insert we might need null.
-        // Let's coerce undefined to null for the DB if needed, but TypeScript might complain.
-        // Actually, let's just use the Supabase client directly.
-        
-        const dbPayload = {
-            ...payload,
-            raga_id: ragaId || null
-        };
-
         const { error } = await supabase
             .from('bandishes')
-            .insert(dbPayload);
+            .update(updatePayload)
+            .eq('id', id);
 
         if (error) throw error;
         
         navigate('/notes');
     } catch (err: any) {
       console.error(err);
-      setError(err.message || 'Failed to save note.');
+      setError(err.message || 'Failed to update bandish.');
     } finally {
       setLoading(false);
     }
   };
+
+  if (dataLoading) {
+    return <div className="text-center py-12 text-slate-500">Loading bandish...</div>;
+  }
 
   return (
     <div className="w-full max-w-2xl mx-auto space-y-8">
@@ -139,7 +167,7 @@ export default function AddBandish() {
         >
           <ArrowLeft size={16} /> <span className="hidden sm:inline">Cancel</span>
         </button>
-        <h1 className="text-xl md:text-2xl font-bold text-white text-right">Add New Bandish</h1>
+        <h1 className="text-xl md:text-2xl font-bold text-white text-right">Edit Bandish</h1>
       </div>
 
       <form onSubmit={handleSubmit} className="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-6">
@@ -276,7 +304,7 @@ export default function AddBandish() {
                         ) : (
                             <div className="h-6 w-6 bg-slate-800 rounded flex items-center justify-center text-xs">+</div>
                         )}
-                        <span className="text-sm truncate">{imageFile ? imageFile.name : 'Click to upload image'}</span>
+                        <span className="text-sm truncate">{imageFile ? imageFile.name : existingImageUrl ? 'Current image (click to change)' : 'Click to upload image'}</span>
                     </label>
                 </div>
              </div>
@@ -290,7 +318,7 @@ export default function AddBandish() {
             disabled={loading}
             className="flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-white px-8 py-3 rounded-xl font-bold transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? 'Saving...' : <><Save size={20} /> Save Bandish</>}
+            {loading ? 'Updating...' : <><Save size={20} /> Update Bandish</>}
           </button>
         </div>
 

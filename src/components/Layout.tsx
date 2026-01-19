@@ -1,8 +1,9 @@
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
-import { Music, Search, X, Menu } from 'lucide-react';
+import {  Search, X, Menu } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import bgImage from '../assets/BG.png';
+import logo from '../assets/swargranthlogo.png';
 
 export default function Layout() {
   const navigate = useNavigate();
@@ -50,8 +51,8 @@ export default function Layout() {
       // Fetch Bandishes
       const { data: bandishes } = await supabase
         .from('bandishes')
-        .select('id, title, raga_id, type')
-        .ilike('title', term)
+        .select('id, title, raga_id, type, composer, tala')
+        .or(`title.ilike.${term},lyrics.ilike.${term},composer.ilike.${term},tala.ilike.${term}`)
         .limit(5);
 
       const results = [
@@ -92,10 +93,12 @@ export default function Layout() {
             <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
                 
                 <Link to="/" className="flex items-center gap-2 group">
-                    <Music className="text-emerald-500 group-hover:rotate-12 transition-transform" size={28} />
-                    <span className="text-xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+                    {/* <Music className="text-emerald-500 group-hover:rotate-12 transition-transform" size={28} /> */}
+                    <img src={logo} alt="Logo" className="w-36" />
+
+                    {/* <span className="text-xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
                         स्वरग्रंथ
-                    </span>
+                    </span> */}
                 </Link>
 
                 {/* Desktop Search */}

@@ -1,47 +1,17 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Plus, Trash2, ArrowLeft, Save, Keyboard } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { ArrowLeft, Save, Keyboard } from 'lucide-react';
 import { ragaService } from '../services/ragaService';
 import SwaraKeyboard from '../components/SwaraKeyboard';
-import type { RagaInput, BandishInput } from '../types/database';
+import type { RagaInput } from '../types/database';
 import { supabase } from '../lib/supabase';
-import { useEffect } from 'react';
-import { BANDISH_TYPES, TAAL_OPTIONS } from '../constants/musicConstants';
 
-export default function AddRaga() {
+export default function EditRaga() {
   const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
   const [loading, setLoading] = useState(false);
+  const [dataLoading, setDataLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [existingComposers, setExistingComposers] = useState<string[]>([]);
-  const [existingTalas, setExistingTalas] = useState<string[]>([]);
-
-  useEffect(() => {
-    loadSuggestions();
-  }, []);
-
-  async function loadSuggestions() {
-    const { data } = await supabase.from('bandishes').select('composer, tala');
-    if (data) {
-        const composers: string[] = Array.from<string>(
-          data.reduce((acc: Map<string, string>, b) => {
-            const val = b.composer?.trim();
-            if (val && !acc.has(val.toLowerCase())) acc.set(val.toLowerCase(), val);
-            return acc;
-          }, new Map<string, string>()).values()
-        ).sort();
-
-        const talas: string[] = Array.from<string>(
-          data.reduce((acc: Map<string, string>, b) => {
-            const val = b.tala?.trim();
-            if (val && !acc.has(val.toLowerCase())) acc.set(val.toLowerCase(), val);
-            return acc;
-          }, new Map<string, string>()).values()
-        ).sort();
-
-        setExistingComposers(composers);
-        setExistingTalas(talas);
-    }
-  }
 
   // Raga State
   const [raga, setRaga] = useState<RagaInput>({
@@ -63,7 +33,6 @@ export default function AddRaga() {
   const handleSwaraInput = (swara: string) => {
     if (!activeField) return;
     const currentValue = raga[activeField] as string;
-    // Add space if needed
     const newValue = currentValue ? `${currentValue} ${swara}` : swara;
     setRaga({ ...raga, [activeField]: newValue });
   };
@@ -86,36 +55,38 @@ export default function AddRaga() {
      setRaga({ ...raga, [activeField]: '' });
   };
 
-  // Bandishes State
-  const [bandishes, setBandishes] = useState<BandishInput[]>([]);
+  useEffect(() => {
+    loadRaga();
+  }, [id]);
 
-  const addBandish = () => {
-    setBandishes([
-      ...bandishes,
-      {
-        raga_id: '', // Will be set on submit
-        title: '',
-        type: 'khayal',
-        tempo: 'madhya',
-        tala: '',
-        lyrics: '',
-        composer: '',
-        audio_url: '',
-        notation_image_url: '',
-      }
-    ]);
-  };
+  async function loadRaga() {
+    if (!id) {
+      setDataLoading(false);
+      return;
+    }
+    
+    const { data, error } = await ragaService.getById(id);
+    
+    if (error || !data) {
+      setError('Failed to load raga');
+      setDataLoading(false);
+      return;
+    }
 
-  const updateBandish = (index: number, field: keyof BandishInput, value: string) => {
-    const newBandishes = [...bandishes];
-    // @ts-expect-error - Typescript is strict about generic string assignment to union types
-    newBandishes[index][field] = value;
-    setBandishes(newBandishes);
-  };
-
-  const removeBandish = (index: number) => {
-    setBandishes(bandishes.filter((_, i) => i !== index));
-  };
+    setRaga({
+      name: data.name || '',
+      thaat: data.thaat || '',
+      time: data.time || '',
+      vadi: data.vadi || '',
+      samvadi: data.samvadi || '',
+      aroha: data.aroha || '',
+      avroha: data.avroha || '',
+      pakad: data.pakad || '',
+      description: data.description || '',
+    });
+    
+    setDataLoading(false);
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -123,20 +94,27 @@ export default function AddRaga() {
     setError(null);
 
     try {
-      const { data, error } = await ragaService.createWithBandishes(raga, bandishes);
+      if (!id) throw new Error('No raga ID provided');
+      
+      const { error } = await supabase
+        .from('ragas')
+        .update(raga)
+        .eq('id', id);
       
       if (error) throw error;
       
-      if (data) {
-        navigate(`/ragas/${data.id}`);
-      }
+      navigate(`/ragas/${id}`);
     } catch (err: unknown) {
       console.error(err);
-      setError('Failed to create Raga. Please try again.');
+      setError('Failed to update Raga. Please try again.');
     } finally {
       setLoading(false);
     }
   };
+
+  if (dataLoading) {
+    return <div className="text-center py-12 text-slate-500">Loading raga...</div>;
+  }
 
   return (
     <div className="w-full max-w-4xl mx-auto space-y-8">
@@ -147,7 +125,7 @@ export default function AddRaga() {
         >
           <ArrowLeft size={16} /> <span className="hidden sm:inline">Cancel</span>
         </button>
-        <h1 className="text-xl md:text-2xl font-bold text-white text-right">Add New Raga</h1>
+        <h1 className="text-xl md:text-2xl font-bold text-white text-right">Edit Raga</h1>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">
@@ -315,144 +293,6 @@ export default function AddRaga() {
            </div>
         </section>
 
-        {/* Bandishes Section */}
-        <section className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-cyan-400">Compositions (Bandishes)</h2>
-            <button 
-              type="button"
-              onClick={addBandish}
-              className="flex items-center gap-2 text-sm bg-slate-800 hover:bg-slate-700 text-cyan-400 px-3 py-2 rounded-lg transition-colors border border-slate-700"
-            >
-              <Plus size={16} /> Add Bandish
-            </button>
-          </div>
-
-          {bandishes.map((bandish, idx) => (
-            <div key={idx} className="bg-slate-900/50 border border-slate-800 rounded-xl p-6 relative group">
-              <button
-                type="button" 
-                onClick={() => removeBandish(idx)}
-                className="absolute top-4 right-4 text-slate-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
-              >
-                <Trash2 size={18} />
-              </button>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                 <div>
-                    <label className="block text-xs font-medium text-slate-500 mb-1 uppercase">Title</label>
-                    <input 
-                      type="text"
-                      className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white focus:border-cyan-500 outline-none"
-                      value={bandish.title}
-                      onChange={e => updateBandish(idx, 'title', e.target.value)}
-                    />
-                 </div>
-                 <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <label className="block text-xs font-medium text-slate-500 mb-1 uppercase">Type</label>
-                      <select 
-                        className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white focus:border-cyan-500 outline-none"
-                        value={bandish.type}
-                        onChange={e => updateBandish(idx, 'type', e.target.value)}
-                      >
-                         {BANDISH_TYPES.map(t => (
-                           <option key={t} value={t.toLowerCase().replace(/\s+/g, '_') === 'khayal' ? 'khayal' : t.toLowerCase()}>{t}</option>
-                         ))}
-                      </select>
-                    </div>
-                     <div>
-                      <label className="block text-xs font-medium text-slate-500 mb-1 uppercase">Tempo</label>
-                      <select 
-                        className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white focus:border-cyan-500 outline-none"
-                        value={bandish.tempo}
-                        onChange={e => updateBandish(idx, 'tempo', e.target.value)}
-                      >
-                         <option value="vilambit">Vilambit</option>
-                         <option value="madhya">Madhya</option>
-                         <option value="drut">Drut</option>
-                      </select>
-                    </div>
-                 </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                 <div>
-                    <label className="block text-xs font-medium text-slate-500 mb-1 uppercase">Composer (Bandishkaar)</label>
-                    <input 
-                      type="text"
-                      list="composer-list"
-                      className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white focus:border-cyan-500 outline-none"
-                      value={bandish.composer || ''}
-                      onChange={e => updateBandish(idx, 'composer', e.target.value)}
-                    />
-                 </div>
-                 <div>
-                    <label className="block text-xs font-medium text-slate-500 mb-1 uppercase">Tala</label>
-                    <input 
-                      type="text"
-                      list="tala-list"
-                      placeholder="e.g. Teentaal"
-                      className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white focus:border-cyan-500 outline-none"
-                      value={bandish.tala || ''}
-                      onChange={e => updateBandish(idx, 'tala', e.target.value)}
-                    />
-                 </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                   <label className="block text-xs font-medium text-slate-500 mb-1 uppercase">Lyrics</label>
-                   <textarea
-                      rows={3}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white focus:border-cyan-500 outline-none resize-none"
-                      value={bandish.lyrics}
-                      onChange={e => updateBandish(idx, 'lyrics', e.target.value)}
-                   />
-                </div>
-                <div className="space-y-2">
-                   <div>
-                      <label className="block text-xs font-medium text-slate-500 mb-1 uppercase">Audio URL (e.g., YouTube/Drive)</label>
-                      <input 
-                        type="url"
-                        placeholder="https://..."
-                        className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white focus:border-cyan-500 outline-none"
-                        value={bandish.audio_url || ''}
-                        onChange={e => updateBandish(idx, 'audio_url', e.target.value)}
-                      />
-                   </div>
-                   <div>
-                      <label className="block text-xs font-medium text-slate-500 mb-1 uppercase">Notation Image URL</label>
-                      <input 
-                        type="url"
-                        placeholder="https://..."
-                        className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white focus:border-cyan-500 outline-none"
-                        value={bandish.notation_image_url || ''}
-                        onChange={e => updateBandish(idx, 'notation_image_url', e.target.value)}
-                      />
-                   </div>
-                </div>
-              </div>
-
-
-            </div>
-          ))}
-
-          {bandishes.length === 0 && (
-             <div className="text-center py-8 bg-slate-900/30 rounded-xl border border-dashed border-slate-800 text-slate-500">
-               No compositions added. Click "Add Bandish" to start.
-             </div>
-          )}
-
-          <datalist id="composer-list">
-             {existingComposers.map(c => <option key={c} value={c} />)}
-          </datalist>
-          <datalist id="tala-list">
-             {TAAL_OPTIONS.map(t => <option key={t} value={t} />)}
-             {existingTalas.filter(t => !TAAL_OPTIONS.includes(t)).map(t => <option key={t} value={t} />)}
-          </datalist>
-        </section>
-
         {error && <div className="text-red-400 bg-red-900/20 p-4 rounded-lg border border-red-900/50">{error}</div>}
 
         <div className="flex justify-end pt-4 border-t border-slate-800">
@@ -461,7 +301,7 @@ export default function AddRaga() {
             disabled={loading}
             className="flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-white px-8 py-3 rounded-xl font-bold transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? 'Saving...' : <><Save size={20} /> Save Raga</>}
+            {loading ? 'Updating...' : <><Save size={20} /> Update Raga</>}
           </button>
         </div>
 
