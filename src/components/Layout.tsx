@@ -1,5 +1,5 @@
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
-import {  Search, X, Menu } from 'lucide-react';
+import { Search, X, Menu } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import bgImage from '../assets/BG.png';
@@ -87,7 +87,7 @@ export default function Layout() {
       style={{ backgroundImage: `url(${bgImage})` }}
     >
         {/* Dark Overlay for readability */}
-        <div className="absolute inset-0 bg-slate-950/80 fixed pointer-events-none z-0"></div>
+        {/* <div className="absolute inset-0 bg-slate-950/80 fixed pointer-events-none z-0"></div> */}
         
         <header className="fixed top-0 w-full z-50 bg-slate-950/80 backdrop-blur-md border-b border-slate-800">
             <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
