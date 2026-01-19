@@ -18,7 +18,7 @@ export default function EditBandish() {
   
   // Form State
   const [title, setTitle] = useState('');
-  const [type, setType] = useState('khayal');
+  const [type, setType] = useState('bada khyal');
   const [ragaId, setRagaId] = useState<string>('');
   const [composer, setComposer] = useState('');
   const [tala, setTala] = useState('');
