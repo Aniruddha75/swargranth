@@ -12,7 +12,7 @@ export default function BandishDetail({ bandish, onClose }: BandishDetailProps) 
   return (
     <div className="fixed inset-0 z-[200] bg-black overflow-y-auto">
       {/* Content */}
-      <div className="w-full max-w-4xl mx-auto p-6 py-8 space-y-8">
+      <div className="w-full max-w-4xl mx-auto p-6 pt-12 pb-8 space-y-8">
         {/* Back Button */}
         <div className="flex items-center justify-between">
           <button

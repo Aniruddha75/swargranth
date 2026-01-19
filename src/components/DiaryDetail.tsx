@@ -38,7 +38,7 @@ export default function DiaryDetail({ entry, onClose, onDeleted }: DiaryDetailPr
   return (
     <div className="fixed inset-0 z-[200] bg-black overflow-y-auto">
       {/* Content */}
-      <div className="w-full max-w-4xl mx-auto p-6 py-8 space-y-8">
+      <div className="w-full max-w-4xl mx-auto p-6 pt-12 pb-8 space-y-8">
         {/* Top Actions */}
         <div className="flex items-center justify-between">
             <button
@@ -46,7 +46,7 @@ export default function DiaryDetail({ entry, onClose, onDeleted }: DiaryDetailPr
             className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors group"
             >
             <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
-            <span>Back to Diary</span>
+            {/* <span>Back to Diary</span> */}
             </button>
 
             <div className="flex items-center gap-3">
@@ -54,7 +54,7 @@ export default function DiaryDetail({ entry, onClose, onDeleted }: DiaryDetailPr
                 to={`/diary/edit/${entry.id}`}
                 className="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-400 transition-colors border border-slate-700"
                 >
-                <Edit2 size={18} />
+                <Edit2 size={16} />
                 <span>Edit</span>
                 </Link>
                 <button
@@ -62,7 +62,7 @@ export default function DiaryDetail({ entry, onClose, onDeleted }: DiaryDetailPr
                 onClick={handleDelete}
                 className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-500 transition-colors border border-red-500/20 disabled:opacity-50"
                 >
-                <Trash2 size={18} />
+                <Trash2 size={16} />
                 <span>{deleting ? 'Deleting...' : 'Delete'}</span>
                 </button>
             </div>
@@ -78,7 +78,7 @@ export default function DiaryDetail({ entry, onClose, onDeleted }: DiaryDetailPr
 
         {/* Title */}
         <div className="text-center space-y-3">
-          <h2 className="text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white to-slate-400 leading-tight">
+          <h2 className="text-2xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white to-slate-400 leading-tight">
             {entry.title}
           </h2>
         </div>
