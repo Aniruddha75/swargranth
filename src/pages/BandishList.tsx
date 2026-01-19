@@ -3,6 +3,7 @@ import { useSearchParams, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Search, Plus, Music, Trash2, Filter, X } from 'lucide-react';
 import BandishDetail from '../components/BandishDetail';
+import { BANDISH_TYPES } from '../constants/musicConstants';
 
 export default function BandishList() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -18,6 +19,8 @@ export default function BandishList() {
   const [composerFilter, setComposerFilter] = useState('');
   const [talaFilter, setTalaFilter] = useState('');
   const [tempoFilter, setTempoFilter] = useState('');
+  const [typeFilter, setTypeFilter] = useState('');
+  const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
     // Sync local state if URL changes (e.g. from global search)
@@ -80,6 +83,7 @@ export default function BandishList() {
     const lyrics = b.lyrics?.toLowerCase() || '';
     const composer = b.composer?.toLowerCase() || '';
     const tala = b.tala?.toLowerCase() || '';
+    const typeValue = b.type?.toLowerCase() || '';
     
     // Search filter
     const matchesSearch = !term || 
@@ -93,17 +97,19 @@ export default function BandishList() {
     const matchesComposer = !composerFilter || b.composer === composerFilter;
     const matchesTala = !talaFilter || b.tala === talaFilter;
     const matchesTempo = !tempoFilter || b.tempo === tempoFilter;
+    const matchesType = !typeFilter || typeValue === typeFilter.toLowerCase().replace(/\s+/g, '_');
     
-    return matchesSearch && matchesComposer && matchesTala && matchesTempo;
+    return matchesSearch && matchesComposer && matchesTala && matchesTempo && matchesType;
   });
   
   const clearFilters = () => {
     setComposerFilter('');
     setTalaFilter('');
     setTempoFilter('');
+    setTypeFilter('');
   };
   
-  const hasActiveFilters = composerFilter || talaFilter || tempoFilter;
+  const hasActiveFilters = composerFilter || talaFilter || tempoFilter || typeFilter;
 
   return (
     <div className="space-y-6">
@@ -118,19 +124,29 @@ export default function BandishList() {
          </Link>
       </div>
 
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-        <input 
-          type="text" 
-          placeholder="Search by title, raga, or lyrics..." 
-          className="w-full bg-slate-900 border border-slate-800 rounded-lg pl-10 pr-4 py-3 text-slate-100 focus:outline-none focus:border-cyan-500 transition-colors"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
+      <div className="flex gap-2">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+          <input 
+            type="text" 
+            placeholder="Search by title, raga, or lyrics..." 
+            className="w-full bg-slate-900 border border-slate-800 rounded-lg pl-10 pr-4 py-3 text-slate-100 focus:outline-none focus:border-cyan-500 transition-colors"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        
+        {/* Mobile Filter Toggle */}
+        <button 
+          onClick={() => setShowFilters(!showFilters)}
+          className={`md:hidden flex items-center justify-center p-3 rounded-lg border transition-colors ${showFilters ? 'bg-cyan-500/20 text-cyan-400 border-cyan-500/50' : 'bg-slate-900 text-slate-400 border-slate-800'}`}
+        >
+          <Filter size={20} />
+        </button>
       </div>
       
       {/* Filters */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-3">
+      <div className={`bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-3 transition-all ${showFilters ? 'block' : 'hidden md:block'}`}>
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-semibold text-slate-300 flex items-center gap-2">
             <Filter size={16} className="text-cyan-400" />
@@ -147,7 +163,7 @@ export default function BandishList() {
           )}
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <div>
             <label className="block text-xs font-medium text-slate-500 mb-1.5">Composer</label>
             <select 
@@ -186,6 +202,20 @@ export default function BandishList() {
               <option value="">All Tempos</option>
               {uniqueTempos.map(t => (
                 <option key={t} value={t}>{t?.charAt(0).toUpperCase() + t?.slice(1)}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-slate-500 mb-1.5">Type</label>
+            <select 
+              className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-sm text-slate-100 focus:outline-none focus:border-cyan-500 transition-colors"
+              value={typeFilter}
+              onChange={(e) => setTypeFilter(e.target.value)}
+            >
+              <option value="">All Types</option>
+              {BANDISH_TYPES.map(t => (
+                <option key={t} value={t}>{t}</option>
               ))}
             </select>
           </div>

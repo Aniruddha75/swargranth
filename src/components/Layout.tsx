@@ -193,7 +193,7 @@ export default function Layout() {
             )}
         </header>
 
-        <main className="pt-24 pb-12 px-4 max-w-7xl mx-auto relative z-10">
+        <main className="pt-24 pb-12 px-4 max-w-full w-full mx-0 relative z-10">
             <Outlet />
         </main>
     </div>

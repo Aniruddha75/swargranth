@@ -96,17 +96,20 @@ export default function EditRaga() {
     try {
       if (!id) throw new Error('No raga ID provided');
       
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('ragas')
         .update(raga)
-        .eq('id', id);
+        .eq('id', id)
+        .select();
       
       if (error) throw error;
+      if (!data || data.length === 0) throw new Error('No raga found to update');
       
+      console.log('Raga update successful:', data);
       navigate(`/ragas/${id}`);
-    } catch (err: unknown) {
-      console.error(err);
-      setError('Failed to update Raga. Please try again.');
+    } catch (err: any) {
+      console.error('Error updating raga:', err);
+      setError(err.message || 'Failed to update Raga. Please try again.');
     } finally {
       setLoading(false);
     }

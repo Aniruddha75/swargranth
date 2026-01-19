@@ -138,16 +138,19 @@ export default function EditBandish() {
             notation_image_url: uploadedImageUrl
         };
 
-        const { error } = await supabase
+        const { data, error } = await supabase
             .from('bandishes')
             .update(updatePayload)
-            .eq('id', id);
+            .eq('id', id)
+            .select();
 
         if (error) throw error;
+        if (!data || data.length === 0) throw new Error('No bandish found to update');
         
+        console.log('Bandish update successful:', data);
         navigate('/notes');
     } catch (err: any) {
-      console.error(err);
+      console.error('Error updating bandish:', err);
       setError(err.message || 'Failed to update bandish.');
     } finally {
       setLoading(false);

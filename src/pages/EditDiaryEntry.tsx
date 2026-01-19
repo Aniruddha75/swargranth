@@ -46,20 +46,24 @@ export default function EditDiaryEntry() {
     setLoading(true);
     
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('diary_entries')
         .update({
           title,
           content,
           image_url: imageUrl || null
         })
-        .eq('id', id);
+        .eq('id', id)
+        .select();
 
       if (error) throw error;
+      if (!data || data.length === 0) throw new Error('No entry found to update');
+      
+      console.log('Update successful:', data);
       navigate('/diary');
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error updating entry:', err);
-      setError('Failed to update entry');
+      setError(err.message || 'Failed to update entry');
       setLoading(false);
     }
   };

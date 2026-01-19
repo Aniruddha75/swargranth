@@ -18,7 +18,7 @@ export interface Bandish {
     created_at: string;
     raga_id: string | null; // Changed to nullable
     title: string; // e.g., "Mero Man"
-    type: 'khayal' | 'dhrupad' | 'thumri' | 'bhajan' | 'general_note' | 'other';
+    type: string; // From BANDISH_TYPES in musicConstants.ts
     tempo: 'vilambit' | 'madhya' | 'drut';
     tala: string; // e.g., Teentaal
     composer?: string; // e.g., "Sadarang"
